@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Yearly Summary</h1>
+
+{% for year, data in yearly_data.items() %}
+<div>
+  <h2>{{ year }}</h2>
+  <p>Total income: ${{ "%.2f"|format(data["income"]) }}</p>
+
+  <table>
+    <tr>
+      <th>Category</th>
+      <th>Total</th>
+      <th>Monthly avg</th>
+      <th>% of Income</th>
+    </tr>
+    {% for category, amount in data["allocations"].items() %}
+    <tr>
+      <td>{{ category }}</td>
+      <td>${{ "%.2f"|format(amount) }}</td>
+      <td>${{ "%.2f"|format(amount / 12) }}</td>
+      <td>{{ "%.1f"|format((amount / data["income"]) * 100) }}%</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td><strong>Total allocated</strong></td>
+      <td><strong>${{ "%.2f"|format(data["allocations"].values()|sum) }}</strong></td>
+      <td><strong>${{ "%.2f"|format(data["allocations"].values()|sum / 12) }}</strong></td>
+      <td><strong>{{ "%.1f"|format((data["allocations"].values()|sum / data["income"]) * 100) }}%</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Remaining</strong></td>
+      <td><strong>${{ "%.2f"|format(data["income"] - data["allocations"].values()|sum) }}</strong></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </table>
+</div>
+{% else %}
+  <p>No data yet — log a paycheck first.</p>
+{% endfor %}
+{% endblock %}s

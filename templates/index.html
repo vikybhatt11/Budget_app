@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Biweekly Budget</h1>
+
+<h2>Log Paycheck</h2>
+<form action="/add-paycheck" method="POST">
+  <label>Date</label>
+  <input type="date" name="date" required>
+  
+  <label>Amount ($)</label>
+  <input type="number" name="amount" step="0.01" id="paycheck-amount" required>
+
+  <h3>Allocations</h3>
+
+  <label>Roth IRA</label>
+  <input type="number" name="roth" step="0.01" value="556">
+
+  <label>House Fund</label>
+  <input type="number" name="house" step="0.01" value="750">
+
+  <label>Emergency Fund</label>
+  <input type="number" name="emergency" step="0.01" value="500">
+
+  <label>Rent</label>
+  <input type="number" name="rent" step="0.01" value="600">
+
+  <label>Car / Transport</label>
+  <input type="number" name="car" step="0.01" value="200">
+
+  <label>Food / Groceries</label>
+  <input type="number" name="food" step="0.01" value="200">
+
+  <label>Subscriptions / Bills</label>
+  <input type="number" name="subscriptions" step="0.01" value="75">
+
+  <label>Dining / Entertainment</label>
+  <input type="number" name="dining" step="0.01" value="150">
+
+  <label>Misc</label>
+  <input type="number" name="misc" step="0.01" value="100">
+
+  <p>Remaining: $<span id="remaining">—</span></p>
+
+  <button type="submit">Save Paycheck</button>
+</form>
+
+<h2>Paychecks</h2>
+{% for p in paychecks %}
+  <div>
+    <h3>{{ p["date"] }} — ${{ p["amount"] }}</h3>
+    <table>
+      <tr>
+        <th>Category</th>
+        <th>Amount</th>
+      </tr>
+      {% for a in p["allocations"] %}
+      <tr>
+        <td>{{ a["category"] }}</td>
+        <td>${{ "%.2f"|format(a["amount"]) }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td><strong>Remaining</strong></td>
+        <td><strong>${{ "%.2f"|format(p["remaining"]) }}</strong></td>
+      </tr>
+    </table>
+  </div>
+{% else %}
+  <p>No paychecks logged yet.</p>
+{% endfor %}
+
+<script>
+  const fields = ["roth","house","emergency","rent","car","food","subscriptions","dining","misc"];
+  
+  function updateRemaining() {
+    const income = parseFloat(document.getElementById("paycheck-amount").value) || 0;
+    const spent = fields.reduce((sum, f) => {
+      return sum + (parseFloat(document.querySelector(`[name=${f}]`).value) || 0);
+    }, 0);
+    document.getElementById("remaining").textContent = (income - spent).toFixed(2);
+  }
+
+  document.getElementById("paycheck-amount").addEventListener("input", updateRemaining);
+  fields.forEach(f => {
+    document.querySelector(`[name=${f}]`).addEventListener("input", updateRemaining);
+  });
+</script>
+{% endblock %}

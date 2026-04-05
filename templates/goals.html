@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Savings Goals</h1>
+
+<h2>Add Goal</h2>
+<form action="/add-goal" method="POST">
+  <label>Goal name</label>
+  <input type="text" name="name" placeholder="e.g. House Fund, Japan Trip" required>
+
+  <label>Target amount ($)</label>
+  <input type="number" name="target" step="0.01" required>
+
+  <label>Already saved ($)</label>
+  <input type="number" name="saved" step="0.01" value="0">
+
+  <label>Target date</label>
+  <input type="date" name="deadline" required>
+
+  <button type="submit">Add Goal</button>
+</form>
+
+<h2>Your Goals</h2>
+{% for g in goals %}
+<div>
+  <h3>{{ g["name"] }}</h3>
+  <p>Target: ${{ "%.2f"|format(g["target"]) }} by {{ g["deadline"] }}</p>
+  <p>Saved: ${{ "%.2f"|format(g["saved"]) }} / ${{ "%.2f"|format(g["target"]) }}</p>
+  <p>Remaining: ${{ "%.2f"|format(g["target"] - g["saved"]) }}</p>
+
+  {% set pct = (g["saved"] / g["target"] * 100)|round|int %}
+  <div style="background:#eee; border-radius:4px; height:12px; width:100%;">
+    <div style="background:#1D9E75; width:{{ pct }}%; height:12px; border-radius:4px;"></div>
+  </div>
+  <p>{{ pct }}% there</p>
+
+  <form action="/update-goal/{{ g['id'] }}" method="POST" style="display:inline;">
+    <input type="number" name="saved" step="0.01" placeholder="Update saved amount" value="{{ g['saved'] }}">
+    <button type="submit">Update</button>
+  </form>
+
+  <form action="/delete-goal/{{ g['id'] }}" method="POST" style="display:inline;">
+    <button type="submit">Delete</button>
+  </form>
+</div>
+<hr>
+{% else %}
+  <p>No goals yet — add one above.</p>
+{% endfor %}
+{% endblock %}
