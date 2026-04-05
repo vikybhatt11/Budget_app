@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget App</title>
+  <title>Budget</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <nav>
-    <a href="/">Biweekly</a>
-    <a href="/monthly">Monthly</a>
-    <a href="/yearly">Yearly</a>
-    <a href="/goals">Goals</a>
+    <a href="/" class="{{ 'active' if request.path == '/' }}">Biweekly</a>
+    <a href="/monthly" class="{{ 'active' if request.path == '/monthly' }}">Monthly</a>
+    <a href="/yearly" class="{{ 'active' if request.path == '/yearly' }}">Yearly</a>
+    <a href="/goals" class="{{ 'active' if request.path == '/goals' }}">Goals</a>
   </nav>
   <main>
     {% block content %}{% endblock %}
